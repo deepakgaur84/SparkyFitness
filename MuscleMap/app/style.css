@@ -6,10 +6,8 @@
   --line: #e1e5ea;
   --accent: #e4572e;
   --accent-soft: rgba(228, 87, 46, .16);
-  --body: #cfd5dd;
-  --body-line: #aab2bd;
-  --muscle: #8fb3d9;
-  --muscle-hover: #e4572e;
+  --body: #dfe3e9;
+  --body-line: #b6bdc8;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -20,10 +18,8 @@
     --line: #2a323d;
     --accent: #ff7a4d;
     --accent-soft: rgba(255, 122, 77, .18);
-    --body: #3a4350;
-    --body-line: #566070;
-    --muscle: #5f86b3;
-    --muscle-hover: #ff7a4d;
+    --body: #2b323d;
+    --body-line: #4a5565;
   }
 }
 
@@ -38,10 +34,11 @@ body {
 a { color: var(--accent); }
 
 .top {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 14px 18px; border-bottom: 1px solid var(--line); background: var(--card);
 }
 .top h1 { font-size: 18px; margin: 0; }
+.quote { margin: 2px 0 0; color: var(--accent); font-size: 14px; font-style: italic; }
 
 .btn {
   display: inline-block; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--accent);
@@ -65,27 +62,35 @@ a { color: var(--accent); }
 .hint { margin: 0 0 6px; color: var(--muted); font-size: 13px; text-align: center; }
 
 #map svg { width: 100%; height: auto; display: block; }
-.fig-label { fill: var(--muted); font-size: 11px; letter-spacing: .12em; text-anchor: middle; }
-.base { fill: var(--body); stroke: var(--body-line); stroke-width: 1; }
+.fig-label { fill: var(--muted); font-size: 44px; letter-spacing: .12em; text-anchor: middle; }
+.base { fill: var(--body); stroke: var(--body-line); stroke-width: 2; stroke-linejoin: round; }
 
 .muscle { cursor: pointer; outline: none; }
-.muscle path { fill: var(--muscle); stroke: var(--card); stroke-width: 1.4; stroke-linejoin: round; transition: fill .12s; }
-.muscle:hover path, .muscle:focus-visible path { fill: var(--muscle-hover); opacity: .8; }
-.muscle.active path { fill: var(--muscle-hover); opacity: 1; }
+.muscle .fill {
+  fill: var(--c); fill-opacity: .85; stroke: var(--c); stroke-width: 6; stroke-linejoin: round;
+  transition: fill-opacity .12s, filter .12s;
+}
+.muscle:hover .fill, .muscle:focus-visible .fill { fill-opacity: 1; filter: brightness(1.12) drop-shadow(0 0 14px var(--c)); }
+.muscle.active .fill { fill-opacity: 1; stroke: var(--text); stroke-width: 7; filter: drop-shadow(0 0 16px var(--c)); }
+svg.has-active .muscle:not(.active) .fill { fill-opacity: .32; }
+svg.has-active .muscle:not(.active):hover .fill { fill-opacity: .9; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .chip {
   border: 1px solid var(--line); background: var(--bg); color: var(--text);
-  border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 13px; cursor: pointer;
+  border-radius: 999px; padding: 5px 11px 5px 9px; font: inherit; font-size: 13px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
 }
-.chip small { color: var(--muted); margin-left: 4px; }
+.chip::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+.chip small { color: var(--muted); margin-left: 2px; }
 .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .chip.active small { color: #fff; opacity: .85; }
+.chip.active::before { box-shadow: 0 0 0 2px #fff; }
 
 .empty { color: var(--muted); padding: 40px 10px; text-align: center; }
 
 .res-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
-.res-head h2 { margin: 0; font-size: 22px; }
+.res-head h2 { margin: 0; font-size: 22px; padding-left: 10px; border-left: 5px solid var(--accent); }
 .count { color: var(--muted); font-size: 14px; }
 
 .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 12px; }

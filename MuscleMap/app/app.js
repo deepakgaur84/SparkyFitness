@@ -5,6 +5,21 @@
   const CFG = window.MUSCLEMAP_CONFIG || {};
   const SPARKY = (CFG.sparkyUrl || '').replace(/\/+$/, '');
 
+  const QUOTES = [
+    'Pick a muscle. Make it count.',
+    'Strong is built one rep at a time.',
+    'Show up. Lift. Repeat.',
+    "Today's effort is tomorrow's strength.",
+    'No shortcuts, just reps.',
+    'Earn the pump.',
+    'Small sets, big progress.',
+    'Consistency beats intensity.',
+    'The last rep is where it counts.',
+    'Do it for the version of you that is coming.',
+    'Train like it matters.',
+    'Progress, not perfection.'
+  ];
+
   // Muscle names exactly as used in the exercise dataset.
   const LABELS = {
     neck: 'Neck', traps: 'Traps', shoulders: 'Shoulders', chest: 'Chest',
@@ -14,45 +29,15 @@
     adductors: 'Inner thigh', abductors: 'Outer hip', calves: 'Calves'
   };
 
-  // Right-hand half of each muscle (viewBox 0..200, centre line x=100). The left half is mirrored.
-  const FRONT = {
-    neck:       ['M100,52 L108,52 L111,66 L100,70 Z'],
-    traps:      ['M111,66 L124,73 L128,78 L118,80 L108,72 Z'],
-    shoulders:  ['M122,78 C138,76 152,84 156,106 L140,104 C134,100 126,94 122,86 Z'],
-    chest:      ['M100,82 L122,86 C126,96 125,108 120,116 C112,122 105,122 100,120 Z'],
-    abdominals: ['M100,124 L116,126 L123,132 L121,186 L115,192 L100,196 Z'],
-    biceps:     ['M140,106 L156,108 L160,150 L144,152 Z'],
-    forearms:   ['M144,155 L160,153 L168,212 L154,215 Z'],
-    abductors:  ['M129,198 L139,204 L136,242 L128,238 Z'],
-    quadriceps: ['M105,206 L128,204 L128,258 L124,310 L108,312 L105,254 Z'],
-    adductors:  ['M100,200 L105,206 L108,270 L100,252 Z'],
-    calves:     ['M108,322 L124,322 L122,380 L113,394 L108,380 Z']
-  };
-  const BACK = {
-    neck:         ['M100,52 L108,52 L111,66 L100,70 Z'],
-    traps:        ['M100,58 L111,66 L128,76 L116,94 L100,110 Z'],
-    shoulders:    ['M122,78 C138,76 152,84 156,106 L140,104 C134,100 126,94 122,86 Z'],
-    'middle back':['M100,112 L116,96 L121,118 L111,132 L100,134 Z'],
-    lats:         ['M123,106 L133,101 L129,148 L114,166 L110,138 L121,122 Z'],
-    'lower back': ['M100,136 L110,140 L113,168 L100,178 Z'],
-    triceps:      ['M140,106 L156,108 L160,150 L144,152 Z'],
-    forearms:     ['M144,155 L160,153 L168,212 L154,215 Z'],
-    glutes:       ['M100,182 L128,184 C134,200 126,218 100,222 Z'],
-    hamstrings:   ['M102,226 L129,224 L127,292 L123,310 L107,310 L103,262 Z'],
-    calves:       ['M108,322 L124,322 L122,380 L113,394 L108,380 Z']
+  // One colour per muscle group, so the body reads like an anatomy chart.
+  const COLORS = {
+    neck: '#6366f1', traps: '#8b5cf6', shoulders: '#f59e0b', chest: '#ef4444',
+    biceps: '#f97316', triceps: '#ec4899', forearms: '#14b8a6', abdominals: '#3b82f6',
+    'middle back': '#22c55e', lats: '#06b6d4', 'lower back': '#84cc16', glutes: '#d946ef',
+    quadriceps: '#10b981', hamstrings: '#eab308', adductors: '#f472b6', abductors: '#a3e635',
+    calves: '#38bdf8'
   };
 
-  // Plain grey parts of the figure (head, hands, feet) so it reads as a body.
-  const BASE_HALF = [
-    'M100,48 L108,50 L112,66 L124,74 L130,80 L156,106 L160,150 L168,212 L166,228 L156,230 L154,216 L146,154 L142,104 L124,100 L122,118 L126,190 L130,198 L136,206 L130,260 L126,312 L124,322 L123,382 L114,398 L110,418 L100,420 Z'
-  ];
-  const HEAD = 'M100,8 C113,8 118,20 117,32 C116,44 109,52 100,52 C91,52 84,44 83,32 C82,20 87,8 100,8 Z';
-  const HANDS_FEET = [
-    'M154,214 L168,212 L172,236 L164,244 L156,236 Z',
-    'M108,396 L122,396 L124,420 L108,422 Z'
-  ];
-
-  const MIRROR = 'matrix(-1 0 0 1 200 0)';
   const NS = 'http://www.w3.org/2000/svg';
 
   function el(name, attrs, parent) {
@@ -62,30 +47,27 @@
     return n;
   }
 
+  // Each figure is drawn in a 1000 x 2000 box (shapes come from body-data.js).
   function figure(root, x, label, shapes) {
     const g = el('g', { transform: `translate(${x} 0)` }, root);
-    el('text', { class: 'fig-label', x: 100, y: 438 }, g).textContent = label;
-    el('path', { class: 'base', d: HEAD }, g);
-    for (const d of BASE_HALF.concat(HANDS_FEET)) {
-      el('path', { class: 'base', d }, g);
-      el('path', { class: 'base', d, transform: MIRROR }, g);
-    }
-    for (const muscle of Object.keys(shapes)) {
-      const m = el('g', {
-        class: 'muscle', 'data-muscle': muscle, tabindex: 0, role: 'button',
-        'aria-label': `${LABELS[muscle]} exercises`
-      }, g);
-      for (const d of shapes[muscle]) {
-        el('path', { d }, m);
-        el('path', { d, transform: MIRROR }, m);
+    el('text', { class: 'fig-label', x: 500, y: 2275 }, g).textContent = label;
+    const groups = {};
+    for (const s of shapes) {
+      if (!s.m) { el('polygon', { class: 'base', points: s.p }, g); continue; }
+      if (!groups[s.m]) {
+        groups[s.m] = el('g', {
+          class: 'muscle', 'data-muscle': s.m, tabindex: 0, role: 'button',
+          'aria-label': `${LABELS[s.m]} exercises`, style: `--c:${COLORS[s.m]}`
+        }, g);
       }
+      el('polygon', { class: 'fill', points: s.p }, groups[s.m]);
     }
   }
 
   function buildMap() {
-    const svg = el('svg', { viewBox: '0 0 440 444', role: 'img', 'aria-label': 'Front and back of the body' });
-    figure(svg, 0, 'FRONT', FRONT);
-    figure(svg, 240, 'BACK', BACK);
+    const svg = el('svg', { viewBox: '-20 -20 2080 2340', role: 'img', 'aria-label': 'Front and back of the body' });
+    figure(svg, 0, 'FRONT', window.BODY.anterior);
+    figure(svg, 1040, 'BACK', window.BODY.posterior);
     document.getElementById('map').appendChild(svg);
     return svg;
   }
@@ -200,8 +182,6 @@
         const a = document.createElement('a');
         a.className = 'btn small';
         a.href = SPARKY + '/exercises';
-        a.target = '_blank';
-        a.rel = 'noopener';
         a.textContent = 'Log in SparkyFitness';
         actions.appendChild(a);
       }
@@ -249,6 +229,8 @@
     $('empty').hidden = true;
     $('results').hidden = false;
     $('muscleTitle').textContent = LABELS[muscle];
+    $('muscleTitle').style.borderLeftColor = COLORS[muscle];
+    document.querySelector('#map svg').classList.add('has-active');
     document.querySelectorAll('.muscle').forEach(n => n.classList.toggle('active', n.dataset.muscle === muscle));
     document.querySelectorAll('.chip').forEach(n => n.classList.toggle('active', n.dataset.muscle === muscle));
     fillEquipment();
@@ -267,7 +249,7 @@
       b.type = 'button';
       b.className = 'chip';
       b.dataset.muscle = m;
-      b.innerHTML = '';
+      b.style.setProperty('--c', COLORS[m]);
       b.append(LABELS[m]);
       const sm = document.createElement('small');
       sm.textContent = n;
@@ -304,7 +286,14 @@
     if (state.muscle) { fillEquipment(); renderList(); }
   }
 
+  function showQuote() {
+    // A new line each day, same all day.
+    const day = Math.floor(Date.now() / 86400000);
+    $('quote').textContent = QUOTES[day % QUOTES.length];
+  }
+
   async function init() {
+    showQuote();
     const svg = buildMap();
     if (SPARKY) {
       const top = $('sparkyTop');
