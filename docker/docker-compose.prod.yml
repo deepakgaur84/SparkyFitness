@@ -198,14 +198,12 @@ services:
       - sparkyfitness-server # Frontend depends on the server
       #- sparkyfitness-garmin # Frontend depends on Garmin microservice. Enable if you are using Garmin Connect features.
 
-  # MuscleMap: tap a muscle, get exercises. Built from the MuscleMap/ folder of this repo.
+  # MuscleMap: tap a muscle, get exercises. Image is built from the MuscleMap/ folder of this repo
+  # by .github/workflows/musclemap-image.yml and published to ghcr.io.
   # Nothing to persist (exercise list is baked into the image).
   musclemap:
-    build:
-      # Builds from the GitHub fork, so this works when the stack is pasted into Dockhand.
-      # If you deploy from a full checkout of the repo instead, use:  context: ../MuscleMap
-      context: https://github.com/deepakgaur84/SparkyFitness.git#main:MuscleMap
-    image: musclemap:latest
+    image: ghcr.io/deepakgaur84/musclemap:latest
+    pull_policy: always
     container_name: musclemap
     environment:
       # Address you open SparkyFitness at (used for the "Log in SparkyFitness" buttons). Defaults to SPARKY_FITNESS_FRONTEND_URL.
