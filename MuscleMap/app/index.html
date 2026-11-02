@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Muscle Map</title>
+<link rel="stylesheet" href="style.css">
+<script src="config.js"></script>
+</head>
+<body>
+<header class="top">
+  <h1>Muscle Map</h1>
+  <a id="sparkyTop" class="btn ghost" href="#" target="_blank" rel="noopener" hidden>Open SparkyFitness</a>
+</header>
+
+<main class="layout">
+  <section class="body-col" aria-label="Body map">
+    <p class="hint">Tap a muscle to see exercises for it.</p>
+    <div id="map"></div>
+    <div id="chips" class="chips" role="group" aria-label="Muscle list"></div>
+  </section>
+
+  <section class="list-col" aria-live="polite">
+    <div id="empty" class="empty">
+      <p>Pick a muscle on the body, or from the list below it.</p>
+    </div>
+
+    <div id="results" hidden>
+      <div class="res-head">
+        <h2 id="muscleTitle"></h2>
+        <span id="muscleCount" class="count"></span>
+      </div>
+
+      <div class="filters">
+        <div class="seg" role="group" aria-label="Which exercises">
+          <button type="button" id="modePrimary" class="on">Main target</button>
+          <button type="button" id="modeAll">Including helpers</button>
+        </div>
+        <label>Equipment
+          <select id="equipment"></select>
+        </label>
+        <label>Level
+          <select id="level">
+            <option value="">Any</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="expert">Expert</option>
+          </select>
+        </label>
+      </div>
+
+      <ul id="list" class="list"></ul>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  Exercise data: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener">free-exercise-db</a> (public domain).
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

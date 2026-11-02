@@ -198,6 +198,22 @@ services:
       - sparkyfitness-server # Frontend depends on the server
       #- sparkyfitness-garmin # Frontend depends on Garmin microservice. Enable if you are using Garmin Connect features.
 
+  # MuscleMap: tap a muscle, get exercises. Built from the MuscleMap/ folder of this repo.
+  # Nothing to persist (exercise list is baked into the image).
+  musclemap:
+    build:
+      # Builds from the GitHub fork, so this works when the stack is pasted into Dockhand.
+      # If you deploy from a full checkout of the repo instead, use:  context: ../MuscleMap
+      context: https://github.com/deepakgaur84/SparkyFitness.git#main:MuscleMap
+    image: musclemap:latest
+    container_name: musclemap
+    environment:
+      # Address you open SparkyFitness at (used for the "Log in SparkyFitness" buttons). Defaults to SPARKY_FITNESS_FRONTEND_URL.
+      SPARKY_URL: ${MUSCLEMAP_SPARKY_URL:-${SPARKY_FITNESS_FRONTEND_URL:-}}
+    networks:
+      - proxynet # shared reverse-proxy network; Zoraxy target is musclemap:80
+    restart: always
+
   # Garmin integration is still work in progress. Enable once table is ready.
   # sparkyfitness-garmin:
   #   image: codewithcj/sparkyfitness_garmin:latest
@@ -218,6 +234,8 @@ services:
 networks:
   sparkyfitness-network:
     driver: bridge
+  proxynet:
+    external: true
 
 # Uncomment the below section to mount the file-based secrets
 # These are the file paths on the host and should not be the same as the paths mentioned above which are in the containers themselves
